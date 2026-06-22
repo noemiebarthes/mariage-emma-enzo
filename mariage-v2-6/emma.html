@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pour Emma 💌</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --rose: #c8707a; --rose-light: #f5e6e8; --rose-deep: #8b4a52; --gold: #c9a96e; --cream: #fdf8f3; --dark: #2a1f1f; --muted: #8a7070; }
+  body { font-family: 'Jost', sans-serif; background: var(--cream); color: var(--dark); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1.5rem; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(circle at 25% 25%, rgba(200,112,122,0.07) 0%, transparent 55%), radial-gradient(circle at 75% 75%, rgba(201,169,110,0.07) 0%, transparent 55%); pointer-events: none; }
+  .wrap { position: relative; z-index: 1; max-width: 520px; width: 100%; text-align: center; animation: fadeUp 0.5s ease both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .ornament { font-size: 2rem; letter-spacing: 10px; color: var(--gold); margin-bottom: 1.5rem; display: block; }
+  h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 7vw, 3.2rem); font-weight: 300; line-height: 1.2; margin-bottom: 0.5rem; }
+  h1 em { font-style: italic; color: var(--rose-deep); }
+  .subtitle { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 2.5rem; font-weight: 300; }
+  .countdown { background: white; border: 0.5px solid rgba(201,169,110,0.3); border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 2.5rem; }
+  .cd-label { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.75rem; }
+  .cd-nums { display: flex; justify-content: center; gap: 1rem; align-items: flex-end; }
+  .cd-unit { text-align: center; }
+  .cd-num { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 600; color: var(--rose-deep); display: block; line-height: 1; }
+  .cd-lbl { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+  .cd-sep { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--gold); opacity: 0.5; padding-bottom: 4px; }
+  .days { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 2rem; }
+  .day-btn { background: white; border: 0.5px solid rgba(200,112,122,0.2); border-radius: 12px; padding: 1rem 0.5rem; cursor: pointer; transition: all 0.2s; text-align: center; text-decoration: none; display: block; }
+  .day-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(200,112,122,0.12); border-color: var(--rose); }
+  .day-btn.locked { opacity: 0.5; cursor: default; background: #fafafa; pointer-events: none; }
+  .day-btn.today { border: 1.5px solid var(--rose); box-shadow: 0 4px 16px rgba(200,112,122,0.15); }
+  .day-btn.jourj { border: 1.5px solid var(--gold); background: linear-gradient(135deg, #fff9f0, #fff5f7); }
+  .day-btn.jourj .day-num { color: var(--gold); }
+  .day-btn.jourj .day-lbl { color: var(--gold); font-weight: 500; }
+  .day-emoji { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+  .day-num { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 600; color: var(--dark); display: block; line-height: 1; }
+  .day-lbl { font-size: 10px; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 2px; display: block; }
+  .today-dot { width: 6px; height: 6px; background: var(--rose); border-radius: 50%; margin: 4px auto 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="ornament">✦ ✦ ✦</span>
+  <h1>Pour toi,<br><em>Emma</em></h1>
+  <p class="subtitle">6 jours de surprises avant le grand jour</p>
+  <div class="countdown">
+    <p class="cd-label">Compte à rebours jusqu'au 27 juin</p>
+    <div class="cd-nums">
+      <div class="cd-unit"><span class="cd-num" id="cd-d">--</span><span class="cd-lbl">jours</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="cd-h">--</span><span class="cd-lbl">heures</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="cd-m">--</span><span class="cd-lbl">min</span></div>
+      <span class="cd-sep">:</span>
+      <div class="cd-unit"><span class="cd-num" id="cd-s">--</span><span class="cd-lbl">sec</span></div>
+    </div>
+  </div>
+  <div class="days" id="days-grid"></div>
+</div>
+<script>
+  // CONFIG — même que jour.html
+  const CONFIG = [
+    { date: '2026-06-22', unlocked: true,  hasContent: true  },
+    { date: '2026-06-23', unlocked: false, hasContent: true  },
+    { date: '2026-06-24', unlocked: false, hasContent: false },
+    { date: '2026-06-25', unlocked: false, hasContent: false },
+    { date: '2026-06-26', unlocked: false, hasContent: false },
+    { date: '2026-06-27', unlocked: false, hasContent: false }
+  ];
+  const LABELS = ['lun.','mar.','mer.','jeu.','ven.','Jour J !'];
+  const WHO = 'emma';
+  const WEDDING = new Date('2026-06-27T00:00:00');
+
+  function tick() {
+    const diff = WEDDING - new Date();
+    if (diff <= 0) { document.querySelector('.countdown').innerHTML = '<p style="font-family:Cormorant Garamond,serif;font-size:1.3rem;color:var(--rose-deep);font-style:italic">🎊 C\'est aujourd\'hui !</p>'; return; }
+    document.getElementById('cd-d').textContent = Math.floor(diff/86400000);
+    document.getElementById('cd-h').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+    document.getElementById('cd-m').textContent = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+    document.getElementById('cd-s').textContent = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+  }
+  tick(); setInterval(tick, 1000);
+
+  function renderDays() {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const grid = document.getElementById('days-grid');
+    grid.innerHTML = CONFIG.map((day, i) => {
+      const d = new Date(day.date + 'T00:00:00'); d.setHours(0,0,0,0);
+      const isToday = d.getTime() === today.getTime();
+      const isJourJ = day.date === '2026-06-27';
+      const isLocked = !day.unlocked || d > today;
+      const emoji = isJourJ ? '💍' : (isLocked ? '🔒' : (day.hasContent ? '🎁' : '📝'));
+      const cls = isLocked ? 'locked' : (isJourJ ? 'jourj' : (isToday ? 'today' : ''));
+      const num = isJourJ ? '27' : d.getDate();
+
+      if (isLocked) {
+        return `<div class="day-btn locked">
+          <span class="day-emoji">🔒</span>
+          <span class="day-num">${num}</span>
+          <span class="day-lbl">${LABELS[i]}</span>
+        </div>`;
+      }
+      return `<a class="day-btn ${cls}" href="jour.html?d=${i+1}&who=${WHO}">
+        <span class="day-emoji">${emoji}</span>
+        <span class="day-num">${num}</span>
+        <span class="day-lbl">${LABELS[i]}</span>
+        ${isToday && !isJourJ ? '<div class="today-dot"></div>' : ''}
+      </a>`;
+    }).join('');
+  }
+  renderDays();
+</script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin 💍</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --rose: #c8707a; --rose-light: #f5e6e8; --rose-deep: #8b4a52;
+    --gold: #c9a96e; --gold-light: #f7f0e3; --cream: #fdf8f3;
+    --dark: #2a1f1f; --muted: #8a7070;
+    --green: #5a8c6a; --green-light: #eaf3ec;
+    --red: #b94a4a; --red-light: #f5e6e6;
+    --purple: #7c3aed; --purple-light: #f0e8fe;
+  }
+  body { font-family: 'Jost', sans-serif; background: var(--cream); color: var(--dark); min-height: 100vh; }
+
+  #login { position: fixed; inset: 0; background: var(--cream); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1rem; text-align: center; padding: 2rem; z-index: 100; }
+  #login h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; }
+  #login p { font-size: 13px; color: var(--muted); }
+  #login input { padding: 10px 16px; border: 0.5px solid rgba(200,112,122,0.4); border-radius: 10px; background: white; font-family: 'Jost', sans-serif; font-size: 15px; width: 260px; }
+  #login button { background: var(--rose-deep); color: white; border: none; padding: 10px 32px; border-radius: 10px; font-family: 'Jost', sans-serif; font-size: 14px; cursor: pointer; }
+  .login-err { color: var(--red); font-size: 13px; display: none; }
+
+  #app { display: none; }
+  .topbar { background: white; border-bottom: 0.5px solid rgba(200,112,122,0.15); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .topbar-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-style: italic; color: var(--rose-deep); }
+  .topbar-links { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .btn { padding: 7px 16px; border-radius: 8px; font-family: 'Jost', sans-serif; font-size: 13px; cursor: pointer; border: 0.5px solid; transition: all 0.15s; text-decoration: none; display: inline-block; }
+  .btn-primary { background: var(--rose-deep); color: white; border-color: var(--rose-deep); }
+  .btn-primary:hover { background: var(--rose); border-color: var(--rose); }
+  .btn-outline { background: white; color: var(--dark); border-color: rgba(0,0,0,0.15); }
+  .btn-outline:hover { background: var(--rose-light); border-color: var(--rose); color: var(--rose-deep); }
+  .btn-danger { background: var(--red-light); color: var(--red); border-color: rgba(185,74,74,0.2); }
+
+  main { max-width: 820px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .page-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; margin-bottom: 0.25rem; }
+  .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 2rem; line-height: 1.6; }
+
+  /* Day cards */
+  .day-cards { display: flex; flex-direction: column; gap: 1rem; }
+  .day-card { background: white; border: 0.5px solid rgba(200,112,122,0.15); border-radius: 16px; overflow: hidden; }
+  .day-card-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; cursor: pointer; }
+  .day-card-header:hover { background: var(--rose-light); }
+  .day-num { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 600; color: var(--rose-deep); min-width: 36px; }
+  .day-info { flex: 1; }
+  .day-info-date { font-size: 13px; color: var(--dark); font-weight: 500; }
+  .day-info-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+  .tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+  .tag-emma { background: #fce7f3; color: #be185d; }
+  .tag-enzo { background: #ede9fe; color: #6d28d9; }
+  .tag-quiz { background: #fef3c7; color: #92400e; }
+  .tag-journal { background: var(--green-light); color: var(--green); }
+  .tag-empty { background: #f5f5f5; color: #999; }
+  .chevron { color: var(--muted); transition: transform 0.2s; font-size: 12px; }
+  .day-card.open .chevron { transform: rotate(90deg); }
+
+  .day-card-body { display: none; padding: 0 1.25rem 1.25rem; border-top: 0.5px solid rgba(200,112,122,0.1); }
+  .day-card.open .day-card-body { display: block; }
+
+  .section-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin: 1rem 0 0.5rem; }
+
+  /* Person panels */
+  .person-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .person-panel { border: 0.5px solid rgba(200,112,122,0.2); border-radius: 12px; padding: 1rem; }
+  .person-panel.emma { border-color: rgba(190,24,93,0.2); background: #fefcfe; }
+  .person-panel.enzo { border-color: rgba(109,40,217,0.2); background: #fefefe; }
+  .person-title { font-weight: 500; font-size: 14px; margin-bottom: 0.75rem; }
+  .person-title.emma { color: #be185d; }
+  .person-title.enzo { color: #6d28d9; }
+
+  label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px; margin-top: 10px; }
+  input[type=text], input[type=url], textarea, select { width: 100%; padding: 8px 10px; border: 0.5px solid rgba(0,0,0,0.15); border-radius: 8px; font-family: 'Jost', sans-serif; font-size: 13px; background: var(--cream); color: var(--dark); }
+  input:focus, textarea:focus { outline: none; border-color: var(--rose); }
+  textarea { resize: vertical; min-height: 70px; }
+
+  .upload-zone { border: 1px dashed rgba(200,112,122,0.35); border-radius: 8px; padding: 0.75rem; text-align: center; cursor: pointer; position: relative; font-size: 12px; color: var(--muted); transition: background 0.15s; }
+  .upload-zone:hover { background: var(--rose-light); }
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+  .file-preview { font-size: 11px; color: var(--green); background: var(--green-light); border-radius: 6px; padding: 4px 8px; margin-top: 5px; display: none; align-items: center; gap: 4px; }
+  .file-preview.show { display: flex; }
+  .file-preview button { background: none; border: none; cursor: pointer; color: var(--red); margin-left: auto; font-size: 12px; }
+
+  .drive-tip { background: var(--purple-light); border-radius: 8px; padding: 0.75rem; font-size: 12px; color: var(--purple); margin-top: 6px; line-height: 1.5; }
+  .drive-tip ol { margin-left: 1.2rem; margin-top: 4px; }
+
+  /* Quiz section */
+  .quiz-section { background: #fffbeb; border: 0.5px solid rgba(201,169,110,0.3); border-radius: 12px; padding: 1rem; }
+  .quiz-options-list { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+  .quiz-opt-row { display: flex; align-items: center; gap: 6px; }
+  .quiz-opt-row input[type=text] { flex: 1; }
+  .quiz-opt-row input[type=radio] { flex-shrink: 0; accent-color: var(--rose); width: 16px; height: 16px; }
+  .quiz-opt-label { font-size: 12px; color: var(--muted); min-width: 20px; }
+
+  /* Journal section */
+  .journal-section { background: var(--green-light); border: 0.5px solid rgba(90,140,106,0.3); border-radius: 12px; padding: 1rem; }
+
+  .toggle-wrap { display: flex; align-items: center; gap: 10px; margin: 1rem 0 0.5rem; padding: 0.75rem 1rem; background: white; border-radius: 10px; border: 0.5px solid rgba(200,112,122,0.2); }
+  .toggle-label { font-size: 13px; color: var(--dark); flex: 1; }
+  .toggle-label span { font-size: 12px; color: var(--muted); display: block; margin-top: 2px; }
+  .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider { position: absolute; inset: 0; background: #ddd; border-radius: 24px; cursor: pointer; transition: background 0.2s; }
+  .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: transform 0.2s; }
+  .toggle input:checked + .toggle-slider { background: var(--green); }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+  .save-btn { background: var(--rose-deep); color: white; border: none; border-radius: 8px; padding: 8px 20px; font-family: 'Jost', sans-serif; font-size: 13px; cursor: pointer; margin-top: 1rem; transition: background 0.15s; }
+  .save-btn:hover { background: var(--rose); }
+  .save-confirm { font-size: 12px; color: var(--green); margin-top: 6px; display: none; }
+
+  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
+  .toast.show { opacity: 1; }
+
+  /* Default content box */
+  .defaults-box { background: white; border: 0.5px solid rgba(200,112,122,0.2); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem; }
+  .defaults-box h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--dark); }
+  .defaults-box p { font-size: 13px; color: var(--muted); margin-bottom: 1rem; line-height: 1.6; }
+  .defaults-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .default-card { background: var(--gold-light); border: 0.5px solid rgba(201,169,110,0.3); border-radius: 10px; padding: 0.75rem; font-size: 13px; cursor: pointer; transition: background 0.15s; }
+  .default-card:hover { background: var(--rose-light); }
+  .default-card .dc-type { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+  .default-card .dc-text { color: var(--dark); line-height: 1.4; font-style: italic; }
+
+  @media (max-width: 520px) {
+    .person-grid { grid-template-columns: 1fr; }
+    .defaults-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <p style="font-size:1.5rem">🔐</p>
+  <h1>Administration</h1>
+  <p>Calendrier surprise Emma & Enzo</p>
+  <input type="password" id="pwd" placeholder="Mot de passe" onkeydown="if(event.key==='Enter')login()" />
+  <p class="login-err" id="lerr">Mot de passe incorrect</p>
+  <button onclick="login()">Accéder</button>
+  <p style="font-size:11px;color:var(--muted);margin-top:0.5rem">Par défaut : <strong>mariage2026</strong></p>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <span class="topbar-title">✦ Admin · Emma & Enzo</span>
+    <div class="topbar-links">
+      <a href="emma.html" target="_blank" class="btn btn-outline">💌 Emma</a>
+      <a href="enzo.html" target="_blank" class="btn btn-outline">💌 Enzo</a>
+      <button class="btn btn-danger" onclick="doLogout()">Déco</button>
+    </div>
+  </div>
+
+  <main>
+    <h1 class="page-title">Les 5 jours avant le mariage</h1>
+    <p class="page-sub">Pour chaque jour, configure les vidéos d'Emma et d'Enzo séparément, ajoute un quiz pour débloquer la vidéo, ou une activité journaling si tu n'as pas de vidéo ce jour-là.</p>
+
+    <!-- Suggestions -->
+    <div class="defaults-box" id="suggestions-box">
+      <h3>💡 Suggestions de contenu</h3>
+      <p>Clique sur une suggestion pour l'appliquer au jour sélectionné dans la liste ci-dessous.</p>
+      <div class="defaults-grid" id="suggestions-grid"></div>
+    </div>
+
+    <div class="day-cards" id="day-cards"></div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DATES = ['2026-06-22','2026-06-23','2026-06-24','2026-06-25','2026-06-26','2026-06-27'];
+const DATE_LABELS = ['Lundi 22 juin','Mardi 23 juin','Mercredi 24 juin','Jeudi 25 juin','Vendredi 26 juin','✨ Samedi 27 juin — Jour J !'];
+
+// Suggestions database
+const SUGGESTIONS = [
+  {
+    type: 'quiz', label: 'Quiz · Première rencontre',
+    apply: (d) => { d.quiz = { question: 'Où Emma et Enzo se sont-ils rencontrés pour la première fois ?', options: ['Au travail','À une soirée','Par des amis communs','En voyage'], answer: 2, successMsg: '🎉 Exactement ! Maintenant découvre ta surprise…', hint: 'C\'était grâce à quelqu\'un que vous connaissiez tous les deux' }; }
+  },
+  {
+    type: 'quiz', label: 'Quiz · Premier rendez-vous',
+    apply: (d) => { d.quiz = { question: 'Quel jour de la semaine était leur premier rendez-vous ?', options: ['Lundi','Vendredi','Samedi','Dimanche'], answer: 1, successMsg: '✨ Bien joué ! Place à la surprise…', hint: 'C\'était en fin de semaine de travail' }; }
+  },
+  {
+    type: 'quiz', label: 'Quiz · Demande en mariage',
+    apply: (d) => { d.quiz = { question: 'Dans quelle ville Enzo a-t-il fait sa demande en mariage ?', options: ['Paris','Rome','Lyon','Barcelone'], answer: 0, successMsg: '💍 Parfait ! Et voici ta surprise du jour…', hint: 'La ville lumière !' }; }
+  },
+  {
+    type: 'journal', label: 'Journal · Meilleur souvenir',
+    apply: (d) => { d.journal = { prompt: 'Quel est ton meilleur souvenir avec l\'autre, celui que tu voudrais ne jamais oublier ?' }; }
+  },
+  {
+    type: 'journal', label: 'Journal · Lettre au futur',
+    apply: (d) => { d.journal = { prompt: 'Écris une courte lettre à votre couple dans 10 ans. Qu\'est-ce que tu leur souhaites ?' }; }
+  },
+  {
+    type: 'journal', label: 'Journal · Vœux secrets',
+    apply: (d) => { d.journal = { prompt: 'Qu\'est-ce que tu voudrais absolument que l\'autre sache le jour de votre mariage, mais que tu n\'as peut-être jamais dit ?' }; }
+  },
+  {
+    type: 'journal', label: 'Journal · Liste de bonheurs',
+    apply: (d) => { d.journal = { prompt: 'Liste 5 petites choses que l\'autre fait qui te rendent heureux·se, même les plus insignifiantes.' }; }
+  },
+  {
+    type: 'journal', label: 'Journal · Veille du mariage',
+    apply: (d) => { d.journal = { prompt: 'À la veille de ton mariage, qu\'est-ce que tu ressens ? Décris ce moment, exactement comme il est.' }; }
+  },
+];
+
+let currentOpenDay = null;
+
+function login() {
+  const pwd = document.getElementById('pwd').value;
+  const stored = localStorage.getItem('admin_pwd') || 'mariage2026';
+  if (pwd === stored) {
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderAll();
+  } else {
+    document.getElementById('lerr').style.display = 'block';
+  }
+}
+function doLogout() {
+  document.getElementById('login').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('pwd').value = '';
+}
+
+function getDays() { try { const raw = localStorage.getItem('calendrier_days'); if (raw) { const p = JSON.parse(raw); while(p.length < 6) p.push({}); return p; } } catch(e) {} return [{},{},{},{},{},{}]; }
+function saveDays(d) { try { localStorage.setItem('calendrier_days', JSON.stringify(d)); } catch(e) { alert('Vidéo trop lourde — utilise un lien Google Drive !'); } }
+
+function renderAll() {
+  renderSuggestions();
+  renderDayCards();
+}
+
+function renderSuggestions() {
+  const grid = document.getElementById('suggestions-grid');
+  grid.innerHTML = SUGGESTIONS.map((s, i) => `
+    <div class="default-card" onclick="applySuggestion(${i})">
+      <div class="dc-type">${s.type === 'quiz' ? '🧩 Quiz' : '📝 Journal'}</div>
+      <div class="dc-text">${s.label.replace(/^[^·]+· /,'')}</div>
+    </div>`).join('');
+}
+
+function applySuggestion(idx) {
+  if (currentOpenDay === null) { toast('Ouvre d\'abord un jour en cliquant dessus ↓'); return; }
+  const days = getDays();
+  SUGGESTIONS[idx].apply(days[currentOpenDay]);
+  saveDays(days);
+  renderDayCards();
+  // Re-open same day
+  setTimeout(() => {
+    const card = document.querySelector(`.day-card[data-idx="${currentOpenDay}"]`);
+    if (card) { card.classList.add('open'); currentOpenDay = parseInt(card.dataset.idx); }
+  }, 50);
+  toast('Suggestion appliquée au jour ' + (currentOpenDay + 1) + ' ✓');
+}
+
+function renderDayCards() {
+  const days = getDays();
+  const container = document.getElementById('day-cards');
+  container.innerHTML = DATES.map((date, i) => {
+    const d = days[i] || {};
+    const tags = [];
+    if (d.emma_video || d.emma_videoLink) tags.push('<span class="tag tag-emma">Vidéo Emma</span>');
+    if (d.enzo_video || d.enzo_videoLink) tags.push('<span class="tag tag-enzo">Vidéo Enzo</span>');
+    if (d.quiz && d.quiz.question) tags.push('<span class="tag tag-quiz">Quiz</span>');
+    if (d.journal && d.journal.prompt) tags.push('<span class="tag tag-journal">Journal</span>');
+    if (!tags.length) tags.push('<span class="tag tag-empty">Vide</span>');
+    const isUnlocked = d.unlocked !== false;
+    tags.push(isUnlocked ? '<span class="tag" style="background:#eaf3ec;color:#5a8c6a">🔓 Débloqué</span>' : '<span class="tag" style="background:#f5e6e8;color:#8b4a52">🔒 Bloqué</span>');
+
+    return `<div class="day-card" data-idx="${i}" id="dc-${i}">
+      <div class="day-card-header" onclick="toggleCard(${i})">
+        <span class="day-num">${String(i+1).padStart(2,'0')}</span>
+        <div class="day-info">
+          <div class="day-info-date">${DATE_LABELS[i]}</div>
+          <div class="day-info-tags">${tags.join('')}</div>
+        </div>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="day-card-body" id="body-${i}">
+        ${renderDayBody(d, i)}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCard(i) {
+  const card = document.getElementById('dc-' + i);
+  const wasOpen = card.classList.contains('open');
+  document.querySelectorAll('.day-card').forEach(c => c.classList.remove('open'));
+  if (!wasOpen) { card.classList.add('open'); currentOpenDay = i; } else { currentOpenDay = null; }
+}
+
+function renderDayBody(d, i) {
+  return `
+  <p class="section-label">Vidéos personnalisées</p>
+  <div class="person-grid">
+    <div class="person-panel emma">
+      <p class="person-title emma">💌 Pour Emma</p>
+      <label>De la part de</label>
+      <input type="text" id="emma_from_${i}" value="${d.emma_from||''}" placeholder="Ex: Ta maman" />
+      <label>Lien Google Drive / YouTube</label>
+      <input type="url" id="emma_videoLink_${i}" value="${d.emma_videoLink||''}" placeholder="https://drive.google.com/..." />
+      <div class="drive-tip">
+        <strong>WhatsApp → Drive :</strong>
+        <ol><li>Sauvegarder la vidéo sur le téléphone</li><li>Uploader sur drive.google.com</li><li>Clic droit → Obtenir le lien → "Toute personne avec le lien"</li><li>Coller ici</li></ol>
+      </div>
+      <label>Ou uploader directement</label>
+      <div class="upload-zone">
+        <input type="file" accept="video/*" onchange="handleFile(event,'emma_video',${i})" />
+        📁 Cliquer ou déposer (max 20MB)
+      </div>
+      <div class="file-preview" id="prev_emma_video_${i}">${d.emma_video ? '✅ Vidéo uploadée' : ''}
+        <button onclick="clearFile('emma_video',${i})">✕</button>
+      </div>
+      <label>Message écrit (optionnel)</label>
+      <textarea id="emma_message_${i}" placeholder="Un mot pour Emma…">${d.emma_message||''}</textarea>
+    </div>
+    <div class="person-panel enzo">
+      <p class="person-title enzo">💌 Pour Enzo</p>
+      <label>De la part de</label>
+      <input type="text" id="enzo_from_${i}" value="${d.enzo_from||''}" placeholder="Ex: Ton frère" />
+      <label>Lien Google Drive / YouTube</label>
+      <input type="url" id="enzo_videoLink_${i}" value="${d.enzo_videoLink||''}" placeholder="https://drive.google.com/..." />
+      <div class="drive-tip">
+        <strong>WhatsApp → Drive :</strong>
+        <ol><li>Sauvegarder la vidéo sur le téléphone</li><li>Uploader sur drive.google.com</li><li>Clic droit → Obtenir le lien → "Toute personne avec le lien"</li><li>Coller ici</li></ol>
+      </div>
+      <label>Ou uploader directement</label>
+      <div class="upload-zone">
+        <input type="file" accept="video/*" onchange="handleFile(event,'enzo_video',${i})" />
+        📁 Cliquer ou déposer (max 20MB)
+      </div>
+      <div class="file-preview" id="prev_enzo_video_${i}">${d.enzo_video ? '✅ Vidéo uploadée' : ''}
+        <button onclick="clearFile('enzo_video',${i})">✕</button>
+      </div>
+      <label>Message écrit (optionnel)</label>
+      <textarea id="enzo_message_${i}" placeholder="Un mot pour Enzo…">${d.enzo_message||''}</textarea>
+    </div>
+  </div>
+
+  <p class="section-label">Quiz (débloque la vidéo)</p>
+  <div class="quiz-section">
+    <label>Question</label>
+    <input type="text" id="quiz_q_${i}" value="${d.quiz?.question||''}" placeholder="Ex: Où vous êtes-vous rencontrés ?" />
+    <p class="section-label" style="margin-top:10px">4 propositions (• = bonne réponse)</p>
+    <div class="quiz-options-list">
+      ${[0,1,2,3].map(j => `
+        <div class="quiz-opt-row">
+          <input type="radio" name="qans_${i}" value="${j}" ${d.quiz?.answer===j?'checked':''} />
+          <span class="quiz-opt-label">${['A','B','C','D'][j]}</span>
+          <input type="text" id="quiz_opt${j}_${i}" value="${d.quiz?.options?.[j]||''}" placeholder="Réponse ${['A','B','C','D'][j]}" />
+        </div>`).join('')}
+    </div>
+    <label>Indice (affiché après 3 erreurs)</label>
+    <input type="text" id="quiz_hint_${i}" value="${d.quiz?.hint||''}" placeholder="Ex: C'était grâce à un ami commun…" />
+    <label>Message de succès</label>
+    <input type="text" id="quiz_success_${i}" value="${d.quiz?.successMsg||''}" placeholder="🎉 Bravo ! Découvre ta surprise…" />
+  </div>
+
+  <p class="section-label">Journaling (si pas de vidéo)</p>
+  <div class="journal-section">
+    <label>Question / invite d'écriture</label>
+    <textarea id="journal_prompt_${i}" placeholder="Ex: Quel est ton meilleur souvenir avec l'autre ?">${d.journal?.prompt||''}</textarea>
+  </div>
+
+  <div class="toggle-wrap">
+    <div class="toggle-label">
+      Débloqué pour Emma & Enzo
+      <span>Si désactivé, le jour reste verrouillé même si la date est passée</span>
+    </div>
+    <label class="toggle">
+      <input type="checkbox" id="unlocked_${i}" ${d.unlocked !== false ? 'checked' : ''} />
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+  <button class="save-btn" onclick="saveDay(${i})">Enregistrer le jour ${i+1} ✓</button>
+  <p class="save-confirm" id="saved_${i}">Sauvegardé ✓</p>
+  `;
+}
+
+const tempFiles = {};
+
+function handleFile(e, field, dayIdx) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 20 * 1024 * 1024) { toast('Fichier trop lourd ! Utilise un lien Drive.'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    if (!tempFiles[dayIdx]) tempFiles[dayIdx] = {};
+    tempFiles[dayIdx][field] = ev.target.result;
+    const prev = document.getElementById('prev_' + field + '_' + dayIdx);
+    if (prev) { prev.innerHTML = `✅ ${file.name} <button onclick="clearFile('${field}',${dayIdx})">✕</button>`; prev.classList.add('show'); }
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearFile(field, dayIdx) {
+  if (tempFiles[dayIdx]) tempFiles[dayIdx][field] = null;
+  const days = getDays();
+  if (days[dayIdx]) days[dayIdx][field] = null;
+  saveDays(days);
+  const prev = document.getElementById('prev_' + field + '_' + dayIdx);
+  if (prev) { prev.innerHTML = ''; prev.classList.remove('show'); }
+}
+
+function convertDriveLink(url) {
+  if (!url) return '';
+  const m = url.match(/\/file\/d\/([^/]+)/);
+  if (m) return 'https://drive.google.com/file/d/' + m[1] + '/preview';
+  return url;
+}
+
+function saveDay(i) {
+  try {
+  const days = getDays();
+  const d = days[i] || {};
+
+  // Videos
+  const fields = ['emma','enzo'];
+  fields.forEach(p => {
+    if (tempFiles[i] && tempFiles[i][p + '_video']) {
+      const videoData = tempFiles[i][p + '_video'];
+      // Check size — base64 is ~1.33x original, 4MB base64 ~ 3MB file
+      if (videoData.length > 4 * 1024 * 1024) {
+        toast('⚠️ Vidéo trop lourde pour ' + p + ' ! Utilise un lien Google Drive.');
+        tempFiles[i][p + '_video'] = null;
+      } else {
+        d[p + '_video'] = videoData;
+      }
+    }
+    const link = document.getElementById(p + '_videoLink_' + i)?.value.trim();
+    d[p + '_videoLink'] = link ? convertDriveLink(link) : '';
+    d[p + '_from'] = document.getElementById(p + '_from_' + i)?.value.trim() || '';
+    d[p + '_message'] = document.getElementById(p + '_message_' + i)?.value.trim() || '';
+  });
+
+  // Quiz
+  const qText = document.getElementById('quiz_q_' + i)?.value.trim();
+  if (qText) {
+    const opts = [0,1,2,3].map(j => document.getElementById('quiz_opt' + j + '_' + i)?.value.trim() || '');
+    const ansEl = document.querySelector(`input[name="qans_${i}"]:checked`);
+    d.quiz = {
+      question: qText,
+      options: opts,
+      answer: ansEl ? parseInt(ansEl.value) : 0,
+      hint: document.getElementById('quiz_hint_' + i)?.value.trim() || '',
+      successMsg: document.getElementById('quiz_success_' + i)?.value.trim() || '🎉 Bravo !'
+    };
+  } else { d.quiz = null; }
+
+  // Journal
+  const jp = document.getElementById('journal_prompt_' + i)?.value.trim();
+  d.journal = jp ? { prompt: jp } : null;
+
+  // Manual unlock
+  const unlockedEl = document.getElementById('unlocked_' + i);
+  d.unlocked = unlockedEl ? unlockedEl.checked : true;
+
+  days[i] = d;
+  saveDays(days);
+
+  const conf = document.getElementById('saved_' + i);
+  if (conf) { conf.style.display = 'block'; setTimeout(() => conf.style.display = 'none', 2500); }
+  renderDayCards();
+  setTimeout(() => {
+    const card = document.getElementById('dc-' + i);
+    if (card) { card.classList.add('open'); currentOpenDay = i; }
+  }, 50);
+  toast('Jour ' + (i+1) + ' sauvegardé ✓');
+  } catch(err) {
+    console.error(err);
+    toast('❌ Erreur : ' + err.message + ' — essaie avec un lien Drive');
+  }
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+renderAll();
+</script>
+</body>
+</html>

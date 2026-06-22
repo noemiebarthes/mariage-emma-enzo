@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surprise du jour 💌</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --rose: #c8707a; --rose-light: #f5e6e8; --rose-deep: #8b4a52;
+    --gold: #c9a96e; --gold-light: #f7f0e3; --cream: #fdf8f3;
+    --dark: #2a1f1f; --muted: #8a7070; --green: #5a8c6a; --green-light: #eaf3ec;
+  }
+  body { font-family: 'Jost', sans-serif; background: var(--cream); color: var(--dark); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem 1.5rem 4rem; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(circle at 25% 25%, rgba(200,112,122,0.06) 0%, transparent 55%), radial-gradient(circle at 75% 75%, rgba(201,169,110,0.06) 0%, transparent 55%); pointer-events: none; }
+  .card { position: relative; z-index: 1; background: white; border-radius: 20px; border: 0.5px solid rgba(200,112,122,0.2); padding: 2rem 1.75rem; max-width: 540px; width: 100%; animation: appear 0.45s ease both; }
+  @keyframes appear { from { opacity:0; transform: translateY(18px) scale(0.97); } to { opacity:1; transform: none; } }
+  .badge { display: inline-block; font-family: 'Cormorant Garamond', serif; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); background: var(--cream); border: 0.5px solid rgba(201,169,110,0.4); padding: 3px 14px; border-radius: 20px; margin-bottom: 1.25rem; }
+  .day-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-style: italic; color: var(--rose-deep); margin-bottom: 0.2rem; }
+  .day-date { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.5rem; }
+  .divider { width: 50px; height: 0.5px; background: var(--gold); opacity: 0.5; margin: 1.25rem 0; }
+  .locked-wrap { text-align: center; padding: 1rem 0; }
+  .locked-emoji { font-size: 3.5rem; display: block; margin-bottom: 1rem; animation: wiggle 0.5s ease 0.3s both; }
+  @keyframes wiggle { 0%{transform:rotate(0)} 25%{transform:rotate(-15deg)} 50%{transform:rotate(15deg)} 75%{transform:rotate(-8deg)} 100%{transform:rotate(0)} }
+  .locked-title { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; color: var(--rose-deep); margin-bottom: 0.75rem; }
+  .locked-msg { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 1.25rem; }
+  .mini-cd { display: flex; justify-content: center; gap: 0.75rem; margin: 1rem 0; }
+  .mini-unit { background: var(--rose-light); padding: 8px 10px; border-radius: 10px; text-align: center; min-width: 48px; }
+  .mini-num { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; color: var(--rose-deep); display: block; line-height: 1; }
+  .mini-lbl { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: block; margin-top: 2px; }
+  .quiz-wrap { }
+  .quiz-intro { font-size: 14px; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.6; }
+  .quiz-question { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-style: italic; color: var(--dark); margin-bottom: 1.25rem; line-height: 1.5; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .quiz-opt { background: var(--cream); border: 0.5px solid rgba(200,112,122,0.25); border-radius: 10px; padding: 10px 14px; cursor: pointer; font-size: 14px; text-align: left; transition: all 0.15s; font-family: 'Jost', sans-serif; color: var(--dark); }
+  .quiz-opt:hover { background: var(--rose-light); border-color: var(--rose); }
+  .quiz-opt.correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+  .quiz-opt.wrong { background: #fdf0f0; border-color: #e0a0a0; color: #a04040; }
+  .quiz-feedback { font-size: 13px; margin-top: 8px; min-height: 20px; font-style: italic; color: var(--muted); }
+  .video-section { display: none; }
+  .video-section.show { display: block; }
+  .from-name { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-style: italic; color: var(--rose-deep); margin-bottom: 4px; }
+  .from-label { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+  .video-wrap { background: #000; border-radius: 12px; overflow: hidden; margin: 1rem 0; position: relative; padding-bottom: 56.25%; height: 0; }
+  .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block; }
+  .journal-wrap { }
+  .journal-prompt { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-style: italic; color: var(--dark); line-height: 1.6; margin-bottom: 1.25rem; }
+  .journal-area { width: 100%; min-height: 150px; border: 0.5px solid rgba(201,169,110,0.4); border-radius: 10px; background: var(--gold-light); padding: 1rem; font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--dark); resize: vertical; line-height: 1.7; }
+  .journal-area:focus { outline: none; border-color: var(--rose); }
+  .journal-save { margin-top: 10px; background: var(--rose-deep); color: white; border: none; border-radius: 8px; padding: 9px 22px; font-family: 'Jost', sans-serif; font-size: 13px; cursor: pointer; }
+  .journal-saved { font-size: 12px; color: var(--green); margin-top: 6px; display: none; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); text-decoration: none; margin-top: 1.5rem; transition: color 0.2s; }
+  .back-link:hover { color: var(--rose); }
+  .confetti-piece { position: fixed; top: -10px; font-size: 18px; animation: fall linear forwards; pointer-events: none; z-index: 999; }
+  @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <p style="text-align:center;color:var(--muted);font-style:italic">Chargement…</p>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURATION — tout est ici, codé en dur
+// ============================================================
+const CONFIG = {
+  weddingDate: '2026-06-27',
+  days: [
+    {
+      date: '2026-06-22',
+      unlocked: true,
+      emma: {
+        from: 'Laurane & Noa',
+        videoLink: 'https://drive.google.com/file/d/1WjoyPy6UHluTBsVlUDyorzGlE-09ddWO/preview',
+        message: ''
+      },
+      enzo: {
+        from: 'Dada & family 🇩🇪',
+        videoLink: 'https://drive.google.com/file/d/1FfzZN3zbnJ4qCzoPrTng433KHoFqQJXq/preview',
+        message: ''
+      },
+      quiz: {
+        question: 'Quel invité vous préférez ?',
+        options: ['Quelqu\'un d\'autre', 'Noémie', 'Personne', 'Pas d\'autre réponse'],
+        answer: 1,
+        successMsg: '🎉 Bravo (évidemment que c\'est moi) ! Découvre ta surprise! 👀',
+        hint: ''
+      },
+      journal: null
+    },
+    { date: '2026-06-23', unlocked: false, emma: null, enzo: null, quiz: null, journal: { prompt: 'Quel est ton meilleur souvenir avec l\'autre ?' } },
+    { date: '2026-06-24', unlocked: false, emma: null, enzo: null, quiz: null, journal: null },
+    { date: '2026-06-25', unlocked: false, emma: null, enzo: null, quiz: null, journal: null },
+    { date: '2026-06-26', unlocked: false, emma: null, enzo: null, quiz: null, journal: null },
+    { date: '2026-06-27', unlocked: false, emma: null, enzo: null, quiz: null, journal: null }
+  ]
+};
+// ============================================================
+
+const params = new URLSearchParams(location.search);
+const dayNum = parseInt(params.get('d')) || 1;
+const who = params.get('who') || 'emma';
+const whoName = who === 'emma' ? 'Emma' : 'Enzo';
+const backPage = who + '.html';
+const idx = dayNum - 1;
+
+const dayData = CONFIG.days[idx] || null;
+const dateStr = dayData ? dayData.date : '';
+const dayDate = new Date(dateStr + 'T00:00:00');
+const today = new Date(); today.setHours(0,0,0,0);
+const isLocked = !dayData || !dayData.unlocked || dayDate > today;
+const isJourJ = dateStr === CONFIG.weddingDate;
+
+const card = document.getElementById('card');
+const dateLabel = dayDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+const LOCKED_MSGS = [
+  { emoji: '🙈', title: 'Hop hop hop !', msg: 'Ce message t\'attend sagement, mais pas avant le ' },
+  { emoji: '⏰', title: 'Pas si vite !', msg: 'Encore un peu de patience jusqu\'au ' },
+  { emoji: '🎁', title: 'Ce cadeau se mérite…', msg: 'Il sera disponible le ' },
+  { emoji: '🔐', title: 'Patience…', msg: 'Rendez-vous le ' },
+  { emoji: '🌸', title: 'Bientôt !', msg: 'Ce moment t\'attend le ' },
+  { emoji: '💍', title: 'Presque !', msg: 'Encore un peu… rendez-vous le ' },
+];
+
+if (isLocked) renderLocked();
+else if (isJourJ) renderJourJ();
+else renderDay();
+
+function renderLocked() {
+  const pick = LOCKED_MSGS[idx % LOCKED_MSGS.length];
+  const ds = dayDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  card.innerHTML = `
+    <span class="badge">Jour ${String(dayNum).padStart(2,'0')} · Pour ${whoName}</span>
+    <div class="locked-wrap">
+      <span class="locked-emoji">${pick.emoji}</span>
+      <p class="locked-title">${pick.title}</p>
+      <p class="locked-msg">${pick.msg}<strong>${ds}</strong></p>
+      <div class="mini-cd" id="mcd"></div>
+    </div>
+    <a href="${backPage}" class="back-link">← Retour</a>`;
+  updateMCD(); setInterval(updateMCD, 1000);
+}
+
+function updateMCD() {
+  const el = document.getElementById('mcd'); if (!el) return;
+  const diff = dayDate - new Date();
+  if (diff <= 0) { location.reload(); return; }
+  const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000),
+        m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+  el.innerHTML = [['jours',d],['h',h],['min',m],['sec',s]].map(([l,v]) =>
+    `<div class="mini-unit"><span class="mini-num">${String(v).padStart(2,'0')}</span><span class="mini-lbl">${l}</span></div>`).join('');
+}
+
+function renderDay() {
+  const personData = dayData[who];
+  const hasVideo = personData && personData.videoLink;
+  const hasQuiz = dayData.quiz && dayData.quiz.question;
+  const hasJournal = dayData.journal && dayData.journal.prompt;
+  const solvedKey = 'quiz_solved_' + who + '_' + idx;
+  const quizSolved = localStorage.getItem(solvedKey) === '1';
+
+  let html = `<span class="badge">Jour ${String(dayNum).padStart(2,'0')} · Pour ${whoName}</span>`;
+  html += `<p class="day-title">${dateLabel}</p><div class="divider"></div>`;
+
+  if (hasVideo) {
+    if (hasQuiz && !quizSolved) {
+      html += quizHTML();
+      html += videoHTML(false);
+    } else {
+      html += videoHTML(true);
+      if (quizSolved) html += `<p style="font-size:12px;color:var(--green);text-align:center;margin-top:-0.5rem;margin-bottom:1rem">✓ Quiz réussi !</p>`;
+    }
+  } else if (hasJournal) {
+    html += journalHTML();
+  } else {
+    html += `<div style="text-align:center;padding:2rem 0;color:var(--muted);font-style:italic">Rien de prévu pour ce jour… reviens demain 🌸</div>`;
+  }
+
+  html += `<a href="${backPage}" class="back-link">← Retour</a>`;
+  card.innerHTML = html;
+
+  if (hasQuiz && hasVideo && !quizSolved) bindQuiz(solvedKey);
+  if (hasJournal && !hasVideo) bindJournal();
+  if (!hasQuiz || quizSolved) confetti();
+}
+
+function renderJourJ() {
+  const personData = dayData[who];
+  const hasVideo = personData && personData.videoLink;
+  const hasQuiz = dayData.quiz && dayData.quiz.question;
+  const solvedKey = 'quiz_solved_' + who + '_' + idx;
+  const quizSolved = localStorage.getItem(solvedKey) === '1';
+
+  confetti(); confetti();
+
+  let html = `<span class="badge" style="background:linear-gradient(135deg,#f7f0e3,#fde8ee);border-color:var(--gold);color:var(--rose-deep)">✨ Jour J · 27 juin 2026 ✨</span>`;
+  html += `<div style="text-align:center;margin:1rem 0 1.5rem">
+    <p style="font-family:Cormorant Garamond,serif;font-size:2rem;font-style:italic;color:var(--rose-deep);line-height:1.3">C'est aujourd'hui,<br><strong>${whoName}</strong> !</p>
+    <p style="font-size:14px;color:var(--muted);margin-top:0.5rem">Le plus beau jour commence 💍</p>
+  </div>`;
+  html += `<div class="divider" style="background:var(--gold);opacity:1;width:80px;margin:1rem auto"></div>`;
+
+  if (hasVideo) {
+    if (hasQuiz && !quizSolved) { html += quizHTML(); html += videoHTML(false); }
+    else { html += videoHTML(true); }
+  } else {
+    html += `<div style="text-align:center;padding:1.5rem 0;color:var(--muted);font-style:italic">Profite de chaque instant aujourd'hui ✨</div>`;
+  }
+
+  html += `<a href="${backPage}" class="back-link">← Retour</a>`;
+  card.innerHTML = html;
+  card.style.border = '1.5px solid var(--gold)';
+  card.style.background = 'linear-gradient(160deg, #fff9f5, #fff5f8)';
+
+  if (hasQuiz && hasVideo && !quizSolved) bindQuiz(solvedKey);
+}
+
+function quizHTML() {
+  const q = dayData.quiz;
+  const opts = q.options.map((o,i) => `<button class="quiz-opt" data-idx="${i}">${o}</button>`).join('');
+  return `<div id="quiz-section" class="quiz-wrap">
+    <p class="quiz-intro">🧩 Une petite question avant de découvrir la surprise…</p>
+    <p class="quiz-question">${q.question}</p>
+    <div class="quiz-options">${opts}</div>
+    <p class="quiz-feedback" id="quiz-feedback"></p>
+  </div><div class="divider"></div>`;
+}
+
+function videoHTML(show) {
+  const p = dayData[who];
+  if (!p) return '';
+  return `<div id="video-section" class="video-section ${show ? 'show' : ''}">
+    <p class="from-name">${p.from || 'Un proche'}</p>
+    <p class="from-label">t'envoie un message</p>
+    <div class="video-wrap"><iframe src="${p.videoLink}" allowfullscreen allow="autoplay"></iframe></div>
+    ${p.message ? `<p style="font-family:Cormorant Garamond,serif;font-size:1.05rem;font-style:italic;line-height:1.8;padding:1.25rem;background:var(--gold-light);border-radius:10px;border-left:2px solid var(--gold);margin:1rem 0">"${p.message}"</p>` : ''}
+  </div>`;
+}
+
+function journalHTML() {
+  const saved = localStorage.getItem('journal_' + who + '_' + idx) || '';
+  return `<div class="journal-wrap">
+    <p class="quiz-intro">📝 Un moment pour toi…</p>
+    <p class="journal-prompt">${dayData.journal.prompt}</p>
+    <textarea class="journal-area" id="journal-text" placeholder="Écris ici…">${saved}</textarea>
+    <button class="journal-save" onclick="saveJournal()">Sauvegarder ✓</button>
+    <p class="journal-saved" id="journal-saved">Sauvegardé ✓</p>
+  </div>`;
+}
+
+function bindQuiz(solvedKey) {
+  const q = dayData.quiz;
+  let attempts = 0;
+  document.querySelectorAll('.quiz-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const chosen = parseInt(btn.dataset.idx);
+      if (chosen === q.answer) {
+        document.querySelectorAll('.quiz-opt').forEach(b => b.disabled = true);
+        btn.classList.add('correct');
+        document.getElementById('quiz-feedback').textContent = q.successMsg || '🎉 Bravo !';
+        document.getElementById('quiz-feedback').style.color = 'var(--green)';
+        localStorage.setItem(solvedKey, '1');
+        confetti();
+        setTimeout(() => {
+          const vs = document.getElementById('video-section');
+          if (vs) vs.classList.add('show');
+          const qs = document.getElementById('quiz-section');
+          if (qs) { qs.style.opacity = '0.5'; qs.style.pointerEvents = 'none'; }
+        }, 800);
+      } else {
+        attempts++;
+        btn.classList.add('wrong');
+        setTimeout(() => btn.classList.remove('wrong'), 600);
+        const hints = ['Essaie encore… 😉', 'Pas tout à fait !', 'Presque… réfléchis bien 🌸'];
+        const fb = document.getElementById('quiz-feedback');
+        fb.textContent = attempts >= 3 && q.hint ? '💡 Indice : ' + q.hint : hints[Math.min(attempts-1, hints.length-1)];
+        fb.style.color = 'var(--muted)';
+      }
+    });
+  });
+}
+
+function bindJournal() {}
+
+function saveJournal() {
+  const text = document.getElementById('journal-text').value;
+  localStorage.setItem('journal_' + who + '_' + idx, text);
+  const el = document.getElementById('journal-saved');
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 2000);
+}
+
+function confetti() {
+  const emojis = ['🌸','✨','💖','🌹','🥂','💫','🎊','💍','🌷'];
+  for (let i = 0; i < 16; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.animationDuration = (1.8 + Math.random() * 2) + 's';
+      el.style.animationDelay = (Math.random() * 0.3) + 's';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }, i * 70);
+  }
+}
+</script>
+</body>
+</html>
