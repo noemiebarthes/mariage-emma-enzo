@@ -91,7 +91,17 @@ const CONFIG = {
       journal: null
     },
     { date: '2026-06-23', unlocked: true, emma: null, enzo: null, quiz: null, journal: { prompt: 'Écris une lettre à la version de toi d\'il y a 5 ans pour lui annoncer la nouvelle.' } },
-    { date: '2026-06-24', unlocked: false, emma: null, enzo: null, quiz: null, journal: null },
+    { date: '2026-06-24', unlocked: true,
+      emma: { from: 'Une surprise', videoLink: 'https://drive.google.com/file/d/14JYHv_EO2dTF5M7vysk-KgyEMqLVCUbU/preview', message: '' },
+      enzo: { from: 'Une surprise', videoLink: 'https://drive.google.com/file/d/14JYHv_EO2dTF5M7vysk-KgyEMqLVCUbU/preview', message: '' },
+      quiz: {
+        question: 'Dans quel village Jésus a-t-il accompli son premier miracle ?',
+        options: ['Bethléem', 'Cana', 'Nazareth', 'Jérusalem'],
+        answer: 1,
+        successMsg: '🍷 Bien joué ! Et comme à Cana, que votre amour transforme chaque instant en quelque chose de merveilleux…',
+        hint: 'C'était lors d'un mariage !'
+      },
+      journal: null },
     { date: '2026-06-25', unlocked: false, emma: null, enzo: null, quiz: null, journal: null },
     { date: '2026-06-26', unlocked: false, emma: null, enzo: null, quiz: null, journal: null },
     { date: '2026-06-27', unlocked: false, emma: null, enzo: null, quiz: null, journal: null }
