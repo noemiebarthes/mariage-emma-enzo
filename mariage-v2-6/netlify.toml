@@ -1,5 +1,5 @@
 [[redirects]]
-  from = "/*"
+  from = "/"
   to = "/emma.html"
   status = 200
   force = false
