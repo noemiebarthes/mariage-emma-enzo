@@ -102,7 +102,10 @@ const CONFIG = {
         hint: 'C\'était lors d\'un mariage !'
       },
       journal: null },
-    { date: '2026-06-25', unlocked: false, emma: null, enzo: null, quiz: null, journal: null },
+    { date: '2026-06-25', unlocked: true,
+      emma: { from: 'Clément', videoLink: '', photoLink: 'https://drive.google.com/uc?export=view&id=1-pYa1QnQ1U4gMR6TZqRRcUuTcE_7jrIG', message: 'C\'est fini les conneries maintenant 😄' },
+      enzo: { from: 'Luc & Esther', videoLink: '', photoLink: 'https://drive.google.com/uc?export=view&id=11dESpNtXfFectGkfAsHNOQFyd7bRysPB', message: 'Salut Enzo,\nJe te souhaite tout le bonheur en cette nouvelle saison !\nEmma a beaucoup de chance et est bénie, de t\'avoir à ses côtés.\nTu es quelqu\'un de vrai, authentique et fiable.\nJe te bénis et pense fort à toi en ce jour, profite de chaque instant pendant ton mariage, ces moments sont uniques et précieux.\nDieu est fidèle dans ta vie et je rends gloire à Dieu pour ce qu\'il fait en toi, ce qu\'il a fait et fera par toi !\nJe te souhaite tout le bonheur, Esther s\'associe à moi.\nTon ami, ton hermano,\nLuc' },
+      quiz: null, journal: null },
     { date: '2026-06-26', unlocked: false, emma: null, enzo: null, quiz: null, journal: null },
     { date: '2026-06-27', unlocked: false, emma: null, enzo: null, quiz: null, journal: null }
   ]
@@ -166,7 +169,7 @@ function updateMCD() {
 
 function renderDay() {
   const personData = dayData[who];
-  const hasVideo = personData && personData.videoLink;
+  const hasVideo = personData && (personData.videoLink || personData.photoLink || personData.message);
   const hasQuiz = dayData.quiz && dayData.quiz.question;
   const hasJournal = dayData.journal && dayData.journal.prompt;
   const solvedKey = 'quiz_solved_' + who + '_' + idx;
@@ -199,7 +202,7 @@ function renderDay() {
 
 function renderJourJ() {
   const personData = dayData[who];
-  const hasVideo = personData && personData.videoLink;
+  const hasVideo = personData && (personData.videoLink || personData.photoLink || personData.message);
   const hasQuiz = dayData.quiz && dayData.quiz.question;
   const solvedKey = 'quiz_solved_' + who + '_' + idx;
   const quizSolved = localStorage.getItem(solvedKey) === '1';
@@ -242,11 +245,21 @@ function quizHTML() {
 function videoHTML(show) {
   const p = dayData[who];
   if (!p) return '';
+  let mediaHtml = '';
+  if (p.videoLink) {
+    mediaHtml += `<div class="video-wrap"><iframe src="${p.videoLink}" allowfullscreen allow="autoplay"></iframe></div>`;
+  }
+  if (p.photoLink) {
+    mediaHtml += `<div style="border-radius:12px;overflow:hidden;margin:1rem 0"><img src="${p.photoLink}" style="width:100%;display:block;max-height:400px;object-fit:cover" alt="Photo" /></div>`;
+  }
+  if (p.message) {
+    const msgFormatted = p.message.replace(/\n/g, '<br>');
+    mediaHtml += `<p style="font-family:Cormorant Garamond,serif;font-size:1.05rem;font-style:italic;line-height:1.8;padding:1.25rem;background:var(--gold-light);border-radius:10px;border-left:2px solid var(--gold);margin:1rem 0">${msgFormatted}</p>`;
+  }
   return `<div id="video-section" class="video-section ${show ? 'show' : ''}">
     <p class="from-name">${p.from || 'Un proche'}</p>
     <p class="from-label">t'envoie un message</p>
-    <div class="video-wrap"><iframe src="${p.videoLink}" allowfullscreen allow="autoplay"></iframe></div>
-    ${p.message ? `<p style="font-family:Cormorant Garamond,serif;font-size:1.05rem;font-style:italic;line-height:1.8;padding:1.25rem;background:var(--gold-light);border-radius:10px;border-left:2px solid var(--gold);margin:1rem 0">"${p.message}"</p>` : ''}
+    ${mediaHtml}
   </div>`;
 }
 
