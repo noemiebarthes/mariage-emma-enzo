@@ -117,7 +117,10 @@ const CONFIG = {
         hint: 'C\'est le livre des origines !'
       },
       journal: null },
-    { date: '2026-06-27', unlocked: false, emma: null, enzo: null, quiz: null, journal: null }
+    { date: '2026-06-27', unlocked: true,
+      emma: { from: 'Josianne & ses parents', videoLink: 'https://drive.google.com/file/d/1ptfg89Wr6L3SPd4yHwosg7X7vG-eSOqA/preview', videoLink2: 'https://drive.google.com/file/d/12ySkfluYOGdc8zJzTIhqbVZ2JjKdJ4PX/preview', photoLink: '', message: '' },
+      enzo: null,
+      quiz: null, journal: null },
   ]
 };
 // ============================================================
@@ -258,6 +261,9 @@ function videoHTML(show) {
   let mediaHtml = '';
   if (p.videoLink) {
     mediaHtml += `<div class="video-wrap"><iframe src="${p.videoLink}" allowfullscreen allow="autoplay"></iframe></div>`;
+  }
+  if (p.videoLink2) {
+    mediaHtml += `<div class="video-wrap" style="margin-top:1rem"><iframe src="${p.videoLink2}" allowfullscreen allow="autoplay"></iframe></div>`;
   }
   if (p.photoLink) {
     mediaHtml += `<div style="border-radius:12px;overflow:hidden;margin:1rem 0"><img src="${p.photoLink}" style="width:100%;display:block;max-height:400px;object-fit:cover" alt="Photo" /></div>`;
